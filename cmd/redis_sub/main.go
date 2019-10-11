@@ -68,6 +68,4 @@ func main() {
 	} else {
 		fmt.Printf("Connected to %s\n", *server)
 	}
-
-	<-c
 }

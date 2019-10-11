@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,20 +17,50 @@ import (
 //
 func WriteCsv(date string, aeroportID string, capteurID string, nature string, valeur string) {
 
-	layout := "2001-01-01 00:00:00.00000000 +0200 CEST m=+0.000000000"
+	layout := "2006-01-02 15:04:05"
 	timestamp, err := time.Parse(layout, date)
 	checkError("Error while parsing date", err)
 
-	hour := timestamp.Format("12:50:55.10341964")
-	day := timestamp.Format("2019-10-11")
+	hour := timestamp.Format("15:04:05")
+	day := timestamp.Format("2006-01-02")
 	dataToWrite := []string{hour, valeur}
 
 	filePath, err := filepath.Abs("../../data/" + aeroportID + "-" + day + "-" + nature + ".csv")
 	checkError("Error in the path", err)
 
-	// Reads the csv file
+	// Reads the csv file if it exists
+	if fileExists(filePath) {
+		appendData(filePath, dataToWrite)
+	} else {
+		fmt.Println("test")
+	}
+
+}
+
+// fileExists verify that a file exists
+//
+// @params filePath (string)
+//
+// @return bool
+//
+func fileExists(filePath string) bool {
+	ret := true
+
+	_, err := os.Open(filePath)
+	if err != nil {
+		ret = false
+	}
+	return ret
+}
+
+// appendData functions appends data to a csv file
+//
+// @params filePath (string), dataToWrite ([]string)
+//
+// @return void
+//
+func appendData(filePath string, dataToWrite []string) {
 	file, err := os.Open(filePath)
-	checkError("Cannot open file", err)
 
 	reader := csv.NewReader(file)
 
@@ -55,6 +86,33 @@ func WriteCsv(date string, aeroportID string, capteurID string, nature string, v
 	checkError("Cannot write data into csv", err)
 }
 
+// createData creates a new csv file with data in it
+//
+// @params filePath (string), dataToWrite ([]string)
+//
+// @return void
+//
+func createData(filePath string, dataToWrite []string) {
+	file, err := os.Create(filePath)
+	checkError("Cannot create file", err)
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	err = writer.WriteAll(dataToWrite)
+	/* for _, value := range dataToWrite {
+		err := writer.WriteAll(value)
+		checkError("Cannot write to file", err)
+	} */
+}
+
+// checkError is the basic error handler function to use
+//
+// @params message (string), err (error)
+//
+// @return void
+//
 func checkError(message string, err error) {
 	if err != nil {
 		log.Fatal("\n"+message, err)

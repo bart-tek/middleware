@@ -1,28 +1,55 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
-	"middleware/internal/captorstruct"
 	"time"
+
+	"github.com/Evrard-Nil/middleware/internal/confcaptorstruct"
+	"github.com/Evrard-Nil/middleware/internal/donneestruct"
+	"github.com/Evrard-Nil/middleware/internal/enumnature"
 )
 
 func main() {
+	fmt.Println(getDonnees())
+	fmt.Println(getDonnees())
+	fmt.Println(getDonnees())
+	fmt.Println(getDonnees())
 
 }
 
-func getDonnees() captorstruct.DonneesCapteur {
+func getDonnees() donneestruct.DonneesCapteur {
 
-	return captorstruct.DonneesCapteur{
-		IDCapteur:  1,
-		IDAeroport: "",
-		Nature:     "Atmospheric pressure",
-		Valeur:     2.,
-		Date:       time.Now()}
+	return donneestruct.DonneesCapteur{
+		IDCapteur:  generateIDCapteur(),
+		IDAeroport: generateIDAeroport(),
+		Nature:     enumnature.PRES,
+		Valeur:     generateValeur(),
+		Date:       time.Now(),
+	}
 
 }
 
-func generatePressureValue() float32 {
+func generateValeur() float32 {
 
-	return rand.Float32()
+	var min float32 = 950
+	var max float32 = 1050
+	return min + rand.Float32()*(max-min)
 
+}
+
+func generateIDCapteur() int {
+	min := 1
+	max := 5
+	return rand.Intn(max-min) + min
+}
+
+func generateIDAeroport() string {
+	min := 0
+	max := 14
+
+	var c confcaptorstruct.ConfCaptorStruct
+	c.GetConf()
+
+	return c.ListeAeroport[rand.Intn(max-min)+min]
 }

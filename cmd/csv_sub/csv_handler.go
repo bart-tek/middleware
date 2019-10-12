@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -52,7 +51,6 @@ func fileExists(filePath string) bool {
 	if err != nil {
 		ret = false
 	}
-	fmt.Println(ret)
 	return ret
 }
 
@@ -66,18 +64,13 @@ func appendData(filePath string, dataToWrite []string) {
 	file, err := os.Open(filePath)
 
 	reader := csv.NewReader(file)
+	reader.TrailingComma = true
 
 	lines, err := reader.ReadAll()
 	checkError("Cannot read file", err)
 
 	// Add column
-	l := len(lines)
-	if len(dataToWrite) < l {
-		l = len(dataToWrite)
-	}
-	for i := 0; i < l; i++ {
-		lines[i] = append(lines[i], dataToWrite[i])
-	}
+	lines = append(lines, dataToWrite)
 
 	// Write the file
 	file, err = os.Create(filePath)
@@ -85,8 +78,13 @@ func appendData(filePath string, dataToWrite []string) {
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
-	err = writer.WriteAll(lines)
-	checkError("Cannot write data into csv", err)
+
+	for _, line := range lines {
+		err = writer.Write(line)
+		checkError("Cannot write data into csv", err)
+	}
+
+	writer.Flush()
 }
 
 // createData creates a new csv file with data in it

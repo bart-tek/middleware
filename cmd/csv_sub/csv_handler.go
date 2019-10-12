@@ -23,16 +23,18 @@ func WriteCsv(date string, aeroportID string, capteurID string, nature string, v
 
 	hour := timestamp.Format("15:04:05")
 	day := timestamp.Format("2006-01-02")
-	dataToWrite := []string{hour, valeur}
+	dataToWrite := [][]string{
+		[]string{hour, valeur},
+	}
 
 	filePath, err := filepath.Abs("../../data/" + aeroportID + "-" + day + "-" + nature + ".csv")
 	checkError("Error in the path", err)
 
 	// Reads the csv file if it exists
 	if fileExists(filePath) {
-		appendData(filePath, dataToWrite)
+		appendData(filePath, dataToWrite[0])
 	} else {
-		fmt.Println("test")
+		createData(filePath, dataToWrite)
 	}
 
 }
@@ -50,6 +52,7 @@ func fileExists(filePath string) bool {
 	if err != nil {
 		ret = false
 	}
+	fmt.Println(ret)
 	return ret
 }
 
@@ -92,7 +95,7 @@ func appendData(filePath string, dataToWrite []string) {
 //
 // @return void
 //
-func createData(filePath string, dataToWrite []string) {
+func createData(filePath string, dataToWrite [][]string) {
 	file, err := os.Create(filePath)
 	checkError("Cannot create file", err)
 	defer file.Close()
@@ -101,10 +104,7 @@ func createData(filePath string, dataToWrite []string) {
 	defer writer.Flush()
 
 	err = writer.WriteAll(dataToWrite)
-	/* for _, value := range dataToWrite {
-		err := writer.WriteAll(value)
-		checkError("Cannot write to file", err)
-	} */
+	checkError("Cannot write to file", err)
 }
 
 // checkError is the basic error handler function to use

@@ -59,5 +59,5 @@ func main() {
 } */
 
 func main() {
-	WriteCsv("2016-06-06 12:50:55", "NTE", "2", "PRESSURE", "2.98")
+	WriteCsv("2016-06-06 12:53:55", "NTE", "2", "PRESSURE", "3.2")
 }

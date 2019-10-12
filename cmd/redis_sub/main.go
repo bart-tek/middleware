@@ -68,4 +68,7 @@ func main() {
 	} else {
 		fmt.Printf("Connected to %s\n", *server)
 	}
+	defer client.Disconnect(250)
+
+	<-c
 }

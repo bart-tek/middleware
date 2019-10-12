@@ -1,4 +1,4 @@
-package captorstruct
+package donneestruct
 
 import "time"
 

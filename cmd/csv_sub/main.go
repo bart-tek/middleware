@@ -30,7 +30,7 @@ func onWindReceived(client MQTT.Client, message MQTT.Message) {
 	WriteCsv(sensorData.Date.String(),
 		sensorData.AeroportID,
 		strconv.Itoa(sensorData.CapteurID),
-		sensorData.Nature,
+		"WIND",
 		fmt.Sprintf("%f", sensorData.Valeur))
 }
 
@@ -46,7 +46,7 @@ func onPressReceived(client MQTT.Client, message MQTT.Message) {
 	WriteCsv(sensorData.Date.String(),
 		sensorData.AeroportID,
 		strconv.Itoa(sensorData.CapteurID),
-		sensorData.Nature,
+		"PRESS",
 		fmt.Sprintf("%f", sensorData.Valeur))
 }
 
@@ -62,7 +62,7 @@ func onTempReceived(client MQTT.Client, message MQTT.Message) {
 	WriteCsv(sensorData.Date.String(),
 		sensorData.AeroportID,
 		strconv.Itoa(sensorData.CapteurID),
-		sensorData.Nature,
+		"TEMP",
 		fmt.Sprintf("%f", sensorData.Valeur))
 }
 
@@ -129,7 +129,7 @@ func main() {
 		if err != nil {
 			log.Printf("%s", err)
 		}
-		client.Publish("captor/pressure", 0, false, captorString)
+		client.Publish("captor/wind", 0, false, captorString)
 	}
 
 	<-c

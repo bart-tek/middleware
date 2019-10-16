@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,10 +33,11 @@ func WriteCsv(date string, aeroportID string, capteurID string, nature string, v
 	// Reads the csv file if it exists
 	if fileExists(filePath) {
 		appendData(filePath, dataToWrite[0])
+		fmt.Println(filePath + " has been edited.")
 	} else {
 		createData(filePath, dataToWrite)
+		fmt.Println("New .csv file written at : " + filePath)
 	}
-
 }
 
 // fileExists verify that a file exists

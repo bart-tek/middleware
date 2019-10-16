@@ -30,7 +30,7 @@ func main() {
 
 	hostname, _ := os.Hostname()
 
-	server := flag.String("server", "farmer.cloudmqtt.com:15652", "The full url of the MQTT server to connect to ex: tcp://127.0.0.1:1883")
+	server := flag.String("server", "farmer.cloudmqtt.com:15652", "The full url of the MQTT server to connect")
 	topicWind := flag.String("topicWind", "captor/wind", "wind topic")
 	topicPress := flag.String("topicPress", "captor/pressure", "pressure topic")
 	topicTemp := flag.String("topicTemp", "captor/temperature", "temperature topic")

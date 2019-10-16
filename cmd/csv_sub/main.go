@@ -1,6 +1,19 @@
 package main
 
-/* func onWindReceived(client MQTT.Client, message MQTT.Message) {
+import (
+	"crypto/tls"
+	"flag"
+	"fmt"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+
+	MQTT "github.com/eclipse/paho.mqtt.golang"
+)
+
+func onWindReceived(client MQTT.Client, message MQTT.Message) {
 	fmt.Printf("Received wind value: %s\n", message.Payload())
 }
 
@@ -56,8 +69,8 @@ func main() {
 	} else {
 		fmt.Printf("Connected to %s\n", *server)
 	}
-} */
-
-func main() {
-	WriteCsv("2016-06-06 12:55:55", "NTE", "2", "PRESSURE", "3.6")
 }
+
+/* func main() {
+	WriteCsv("2016-06-06 12:55:55", "NTE", "2", "PRESSURE", "3.6")
+} */

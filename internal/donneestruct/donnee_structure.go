@@ -5,14 +5,16 @@ import (
 	"time"
 )
 
+// DonneesCapteur represente les données reçus depuis MQTT
+//
 type DonneesCapteur struct {
-	IDCapteur  int
-	IDAeroport string
-	Nature     string
-	Valeur     float32
-	Date       time.Time
+	CapteurID  int       `json:"capteur_id"`
+	AeroportID string    `json:"aeroport_id"`
+	Nature     string    `json:"nature"`
+	Valeur     float32   `json:"valeur"`
+	Date       time.Time `json:"date"`
 }
 
 func (d DonneesCapteur) String() string {
-	return fmt.Sprintf("{\nIDCapteur: %d"+"\nIDAeroport: %s"+"\nNature: %s"+"\nValeur: %f"+"\nDate: %s\n}\n", d.IDCapteur, d.IDAeroport, d.Nature, d.Valeur, d.Date.Format("2006-01-02 15:04:05"))
+	return fmt.Sprintf("{CapteurID: %d"+"AeroportID: %s"+"\nNature: %s"+"\nValeur: %f"+"\nDate: %s\n}\n", d.CapteurID, d.AeroportID, d.Nature, d.Valeur, d.Date.Format("2006-01-02 15:04:05"))
 }

@@ -21,8 +21,8 @@ func main() {
 func getDonnees() donneestruct.DonneesCapteur {
 
 	return donneestruct.DonneesCapteur{
-		IDCapteur:  generateIDCapteur(),
-		IDAeroport: generateIDAeroport(),
+		CapteurID:  generateIDCapteur(),
+		AeroportID: generateIDAeroport(),
 		Nature:     enumnature.WIND,
 		Valeur:     generateValeur(),
 		Date:       time.Now(),

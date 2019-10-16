@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// DonneesCapteur represente les données reçus depuis MQTT
+// DonneesCapteur represente les données des capteurs reçus depuis MQTT
 //
 type DonneesCapteur struct {
 	CapteurID  int       `json:"capteur_id"`

@@ -21,8 +21,8 @@ func main() {
 func getDonnees() donneestruct.DonneesCapteur {
 
 	return donneestruct.DonneesCapteur{
-		IDCapteur:  generateIDCapteur(),
-		IDAeroport: generateIDAeroport(),
+		CapteurID:  generateCapteurID(),
+		AeroportID: generateAeroportID(),
 		Nature:     enumnature.PRES,
 		Valeur:     generateValeur(),
 		Date:       time.Now(),
@@ -38,13 +38,13 @@ func generateValeur() float32 {
 
 }
 
-func generateIDCapteur() int {
+func generateCapteurID() int {
 	min := 1
 	max := 5
 	return rand.Intn(max-min) + min
 }
 
-func generateIDAeroport() string {
+func generateAeroportID() string {
 	min := 0
 	max := 14
 

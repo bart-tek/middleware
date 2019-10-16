@@ -1,7 +1,7 @@
 package captorint
 
 type Captor interface {
-	generateIDCapteur() int
-	generateIDAeroport() string
+	generateCapteurID() int
+	generateAeroportID() string
 	generateValeur() float32
 }

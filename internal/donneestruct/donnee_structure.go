@@ -16,5 +16,5 @@ type DonneesCapteur struct {
 }
 
 func (d DonneesCapteur) String() string {
-	return fmt.Sprintf("{CapteurID: %d"+"AeroportID: %s"+"\nNature: %s"+"\nValeur: %f"+"\nDate: %s\n}\n", d.CapteurID, d.AeroportID, d.Nature, d.Valeur, d.Date.Format("2006-01-02 15:04:05"))
+	return fmt.Sprintf("{\"capteur_id\": %d"+"\n\"aeroport_id\": \"%s\""+"\n\"nature\": \"%s\""+"\n\"valeur\": %f"+"\n\"date\": %s\n}\n", d.CapteurID, d.AeroportID, d.Nature, d.Valeur, d.Date)
 }

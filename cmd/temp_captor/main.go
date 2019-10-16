@@ -1,21 +1,25 @@
 package main
 
 import (
+	"crypto/tls"
+	"flag"
 	"fmt"
 	"math/rand"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/Evrard-Nil/middleware/internal/confcaptorstruct"
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
 	"github.com/Evrard-Nil/middleware/internal/enumnature"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func main() {
-	fmt.Println(getDonnees())
-	fmt.Println(getDonnees())
-	fmt.Println(getDonnees())
-	fmt.Println(getDonnees())
-
+	publish()
 }
 
 func getDonnees() donneestruct.DonneesCapteur {
@@ -52,4 +56,64 @@ func generateAeroportID() string {
 	c.GetConf()
 
 	return c.ListeAeroport[rand.Intn(max-min)+min]
+}
+
+func connect() mqtt.Client {
+
+	hostname, _ := os.Hostname()
+
+	server := flag.String("server", "farmer.cloudmqtt.com:15652", "The full url of the MQTT server to connect to ex: tcp://127.0.0.1:1883")
+
+	clientid := flag.String("clientid", hostname+strconv.Itoa(time.Now().Second()), "A clientid for the connection")
+	username := flag.String("username", "pvpuovcq", "A username to authenticate to the MQTT server")
+	password := flag.String("password", "h56KR9mXu9Xu", "Password to match username")
+
+	flag.Parse()
+
+	opts := mqtt.NewClientOptions()
+	opts.AddBroker(*server)
+	opts.SetClientID(*clientid)
+	opts.SetCleanSession(true)
+	if *username != "" {
+		opts.SetUsername(*username)
+		if *password != "" {
+			opts.SetPassword(*password)
+		}
+	}
+
+	tlsConfig := &tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert}
+	opts.SetTLSConfig(tlsConfig)
+
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
+	} else {
+		fmt.Printf("Connected to %s\n", *server)
+	}
+
+	return client
+}
+
+func publish() {
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	client := connect()
+	defer client.Disconnect(250)
+
+	qos := flag.Int("qos", 0, "The QoS to subscribe to messages at")
+	topicTemp := flag.String("topicTemp", "captor/temp", "temp topic")
+
+	flag.Parse()
+loop:
+	for {
+		select {
+		default:
+			client.Publish(*topicTemp, byte(*qos), false, getDonnees().String())
+			time.Sleep(time.Second)
+		case <-c:
+			break loop
+		}
+	}
 }

@@ -2,36 +2,77 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
+	"time"
+
+	"github.com/Evrard-Nil/middleware/internal/donneestruct"
+	"github.com/gomodule/redigo/redis"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
+var layoutHeure = "2006-01-02T15:04:05Z"
+var layoutDate = "2006-01-02"
+var redisCli redis.Conn
 
+func main() {
+	redisCli = newRedisClient("redis-10932.c1.us-west-2-2.ec2.cloud.redislabs.com:10932", "uutPD4Eh1qkYtGWxiuYvfXE7Ri5N7oPQ")
+	http.HandleFunc("/api/v1/mesures/", mesuresHandler)
+	http.HandleFunc("/api/v1/moyennes/", moyennesHandler)
+	defer redisCli.Close()
+	err := http.ListenAndServe(":8082", nil)
+	log.Fatal(err)
 }
 
-type person struct {
-	id   int
-	name string
-}
+// Récupérer un type de données d'un aéroprt entre deux dates
+func mesuresHandler(w http.ResponseWriter, r *http.Request) {
 
-var persons []person
-
-func init() {
-	persons = []person{
-		person{id: 1, name: "JBey"},
-		person{id: 2, name: "JBey"},
-		person{id: 3, name: "JBey"},
-		person{id: 4, name: "JBey"},
-		person{id: 5, name: "JBey"},
-		person{id: 6, name: "JBey"},
-		person{id: 7, name: "JBey"},
-		person{id: 8, name: "JBey"},
-		person{id: 9, name: "JBey"},
-		person{id: 10, name: "JBey"},
+	if r.Method == "GET" {
+		urlParts := strings.Split(r.URL.Path, "/")
+		if len(urlParts) == 6 {
+			aeroport := urlParts[4]
+			nature := urlParts[5]
+			queryValues := r.URL.Query()
+			beginDate := queryValues.Get("beginDate")
+			beginTime, err1 := time.Parse(layoutHeure, beginDate)
+			endDate := queryValues.Get("endDate")
+			endTime, err2 := time.Parse(layoutHeure, endDate)
+			if err1 == nil && err2 == nil {
+				fmt.Printf("begin : ", beginTime)
+				fmt.Printf("end : ", endTime)
+				test := donneestruct.MonTest{Nature: nature, Aeroport: aeroport}
+				w.WriteHeader(http.StatusFound)
+				writeJSON(w, test)
+				return
+			}
+		}
 	}
+
+	w.WriteHeader(http.StatusBadRequest)
+}
+
+// Récupérer les moyennes pour chaque type de nature pour une aéroport à une date
+func moyennesHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "GET" {
+		urlParts := strings.Split(r.URL.Path, "/")
+		if len(urlParts) == 5 {
+			aeroport := urlParts[4]
+			queryValues := r.URL.Query()
+			date := queryValues.Get("date")
+			dateTime, err := time.Parse(layoutDate, date)
+			if err == nil {
+				fmt.Printf("date : ", dateTime)
+				test := donneestruct.MonTest{Nature: "null", Aeroport: aeroport}
+				w.WriteHeader(http.StatusFound)
+				writeJSON(w, test)
+				return
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
 }
 
 func writeJSON(w http.ResponseWriter, data interface{}) {
@@ -44,27 +85,12 @@ func writeJSON(w http.ResponseWriter, data interface{}) {
 	w.Write(jsonData)
 }
 
-func personHandler(w http.ResponseWriter, r *http.Request) {
-	strPath := r.URL.Path
-	arrPath := strings.Split(strPath, "/")
-	strID := arrPath[len(arrPath)-1]
-	ID, err := strconv.Atoi(strID)
+func newRedisClient(addr string, pass string) redis.Conn {
+	client, err := redis.Dial("tcp", addr, redis.DialPassword(pass))
 	if err != nil {
 		log.Fatal(err)
-	}
-	if ID > 10 || ID < 1 {
-		w.WriteHeader(http.StatusNotFound)
 	} else {
-		w.WriteHeader(http.StatusFound)
-		newPerson := person{}
-		newPerson.name = "jbey"
-		newPerson.id = ID
-		writeJSON(w, newPerson)
+		log.Printf("Succesfully connected to Redis at %s\n", addr)
 	}
-}
-
-func main() {
-	http.HandleFunc("/api/v1/person/", personHandler)
-	err := http.ListenAndServe(":80", nil)
-	log.Fatal(err)
+	return client
 }

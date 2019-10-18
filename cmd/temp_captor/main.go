@@ -103,7 +103,7 @@ func publish() {
 	defer client.Disconnect(250)
 
 	qos := flag.Int("qos", 0, "The QoS to subscribe to messages at")
-	topicTemp := flag.String("topicTemp", "captor/temp", "temp topic")
+	topicTemp := flag.String("topicTemp", "captor/temperature", "temp topic")
 
 	flag.Parse()
 loop:

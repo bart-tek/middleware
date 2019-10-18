@@ -2,7 +2,7 @@
   "name": "front",
   "version": "1.0.0",
   "description": "User Interface for middleware project",
-  "main": "index.js",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -5,47 +5,47 @@
 	Samples.items = [{
 		title: 'Airports',
 		items: [{
-			title: 'ORY',
+			title: 'ORLY (ORY)',
 			path: 'chart.html?airport_id=ORY&title=ORLY'
 		}, {
-			title: 'NCE',
-			path: ''
+			title: 'NICE (NCE)',
+			path: 'chart.html?airport_id=NCE&title=NICE'
 		}, {
-			title: 'LYS',
-			path: ''
+			title: 'LYON (LYS)',
+			path: 'chart.html?airport_id=LYS&title=LYON'
 		}, {
-			title: 'TLS',
-			path: ''
+			title: 'TOULOUSE (TLS)',
+			path: 'chart.html?airport_id=TLS&title=TOULOUSE'
 		}, {
-			title: 'MRS',
-			path: ''
+			title: 'MARSEILLE (MRS)',
+			path: 'chart.html?airport_id=MRS&title=MARSEILLE'
 		}, {
-			title: 'BSL',
-			path: ''
+			title: 'BASEL (BSL)',
+			path: 'chart.html?airport_id=BSL&title=BASEL'
 		}, {
-			title: 'BOD',
-			path: ''
+			title: 'BORDEAUX (BOD)',
+			path: 'chart.html?airport_id=BOD&title=BORDEAUX'
 		}, {
-			title: 'NTE',
-			path: ''
+			title: 'NANTES (NTE)',
+			path: 'chart.html?airport_id=NTE&title=NANTES'
 		}, {
-			title: 'BVA',
-			path: ''
+			title: 'BEAUVAIS (BVA)',
+			path: 'chart.html?airport_id=BVA&title=BEAUVAIS'
 		}, {
-			title: 'RUN',
-			path: ''
+			title: 'SAINT-DENIS (RUN)',
+			path: 'chart.html?airport_id=RUN&title=SAINT-DENIS'
 		}, {
-			title: 'PTP',
-			path: ''
+			title: 'POINTE-A-PITRE (PTP)',
+			path: 'chart.html?airport_id=RUN&title=POINTE-A-PITRE'
 		}, {
-			title: 'LIL',
-			path: ''
+			title: 'LILLE (LIL)',
+			path: 'chart.html?airport_id=LIL&title=LILLE'
 		}, {
-			title: 'FDF',
-			path: ''
+			title: 'FORT-DE-FRANCE (FDF)',
+			path: 'chart.html?airport_id=FDF&title=FORT-DE-FRANCE'
 		}, {
-			title: 'MPL',
-			path: ''
+			title: 'MONTPELLIER (MPL)',
+			path: 'chart.html?airport_id=MPL&title=MONTPELLIER'
 		}]
 	}];
 }(this));

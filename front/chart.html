@@ -2,45 +2,110 @@
 <html>
 
 <head>
+	<meta charset="utf-8">
 	<script src="node_modules/chart.js/dist/Chart.min.js"></script>
+	<script src="node_modules/chart.js/dist/Chart.js"></script>
 	<script src="utils.js"></script>
 	<style>
-	canvas{
-		-moz-user-select: none;
-		-webkit-user-select: none;
-		-ms-user-select: none;
-	}
+		/* Create two equal columns that floats next to each other */
+		.column {
+			padding: 10px;
+			height: 300px; /* Should be removed. Only for demonstration */
+		}
+
+		#airport-title {
+			color: #444;
+			font-weight: 300;
+			font-size: 1.5rem;
+		}
+
+		.row {
+			-webkit-align-content: center;
+			align-content: center;
+			position: relative;
+			height: 50%;
+			width: 100%;
+		}
+
+		/* Clear floats after the columns */
+		.row:after {
+			content: "";
+			display: table;
+			clear: both;
+		}
+
+		.card {
+			/* Add shadows to create the "card" effect */
+			box-shadow: 0 4px 16px 0 rgba(0,0,0,0.2);
+			transition: 0.3s;
+		}
+
+		/* On mouse-over, add a deeper shadow */
+		.card:hover {
+			box-shadow: 0 8px 32px 0 rgba(0,0,0,0.2);
+		}
+
+		/* Add some padding inside the card container */
+		.container {
+			padding: 2px 16px;
+			margin: 10 10 10 10;
+		}
+
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
 	</style>
 </head>
 
 <body>
-	<div style="width:75%;">
-		<canvas id="canvas"></canvas>
+	<div id="airport-title"></div>
+	<div class="row">
+		<div class="column" style="width: 75%; float: left;">
+			<canvas id="temp-mesures"></canvas>
+			<canvas id="pres-mesures"></canvas>
+			<canvas id="wind-mesures"></canvas>
+		</div>
+		<div class="column" style="width: 20%; float: right;">
+			<div class="card">
+				<div class="container">
+					<h4><b>Airport temperature average</b></h4> 
+					<p id="temp-moyenne">12°C</p> 
+				</div>
+				<div class="container">
+					<h4><b>Airport pressure average</b></h4> 
+					<p id="pres-moyenne">12°C</p> 
+				</div>
+				<div class="container">
+					<h4><b>Airport wind average</b></h4> 
+					<p id="wind-moyenne">12°C</p> 
+				</div>
+			</div>
+		</div>
 	</div>
+	
+
 	<script>
 		function getInformations() {
 			var parameters = location.search.substring(1).split("&")
 			var temp = parameters[0].split("=");
-
-			console.log(parameters)
-			console.log(temp)
 			temp = parameters[1].split("=");
-			console.log(temp)
 			airportId = unescape(temp[1]);
-			
 			airportName = unescape(temp[1]);
-			document.title = airportName + " charts"
+			document.title = airportName + " airport charts"
+			document.getElementById("airport-title").innerHTML = airportName + " airport"
 		}
 		
 		getInformations()
 		
 		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-		var config = {
+		var tempConfig = {
 			type: 'line',
 			data: {
 				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
 				datasets: [{
-					label: 'My First dataset',
+					label: 'Temperature data',
 					backgroundColor: window.chartColors.red,
 					borderColor: window.chartColors.red,
 					data: [
@@ -59,7 +124,7 @@
 				responsive: true,
 				title: {
 					display: true,
-					text: 'Chart.js Line Chart'
+					text: 'Temperature Chart'
 				},
 				tooltips: {
 					mode: 'index',
@@ -81,24 +146,125 @@
 						display: true,
 						scaleLabel: {
 							display: true,
-							labelString: 'Value'
+							labelString: 'Temperature (°C)'
+						}
+					}]
+				}
+			}
+		};
+		var presConfig = {
+			type: 'line',
+			data: {
+				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+				datasets: [{
+					label: 'Pressure data',
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor()
+					],
+					fill: false,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Pressure Chart'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Month'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Pressure (Pa)'
+						}
+					}]
+				}
+			}
+		};
+
+		var windConfig = {
+			type: 'line',
+			data: {
+				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+				datasets: [{
+					label: 'Wind data',
+					backgroundColor: window.chartColors.green,
+					borderColor: window.chartColors.green,
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor()
+					],
+					fill: false,
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Wind Chart'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Month'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Wind (°C)'
 						}
 					}]
 				}
 			}
 		};
 		window.onload = function() {
-			var ctx = document.getElementById('canvas').getContext('2d');
-			window.myLine = new Chart(ctx, config);
+			var ctx = document.getElementById('temp-mesures').getContext('2d');
+			var tempChart = new Chart(ctx, tempConfig);
+			var ctx = document.getElementById('pres-mesures').getContext('2d');
+			var presChart = new Chart(ctx, presConfig);
+			var ctx = document.getElementById('wind-mesures').getContext('2d');
+			var windChart = new Chart(ctx, windConfig);
 		};
-		document.getElementById('randomizeData').addEventListener('click', function() {
-			config.data.datasets.forEach(function(dataset) {
-				dataset.data = dataset.data.map(function() {
-					return randomScalingFactor();
-				});
-			});
-			window.myLine.update();
-		});
 		var colorNames = Object.keys(window.chartColors);
 	</script>
 </body>

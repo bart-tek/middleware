@@ -102,7 +102,7 @@ func publish() {
 	defer client.Disconnect(250)
 
 	qos := flag.Int("qos", 0, "The QoS to subscribe to messages at")
-	topicPress := flag.String("topicPress", "captor/press", "press topic")
+	topicPress := flag.String("topicPress", "captor/pressure", "press topic")
 
 	flag.Parse()
 loop:

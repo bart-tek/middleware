@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Evrard-Nil/middleware/internal/donneestruct"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gomodule/redigo/redis"
 )
@@ -18,17 +20,19 @@ import (
 var redisCli redis.Conn
 var mQTTCli MQTT.Client
 
-func onWindReceived(client MQTT.Client, message MQTT.Message) {
-	fmt.Printf("Received wind value: %s\n", message.Payload())
+func onValueReceived(client MQTT.Client, message MQTT.Message) {
+	var sensorData donneestruct.DonneesCapteur
+	if err := json.Unmarshal(message.Payload(), &sensorData); err != nil {
+		log.Printf("%s", err)
+	}
+	fmt.Printf("Received "+sensorData.Nature+" value: %s\n", message.Payload())
+	key := sensorData.AeroportID + "." + strconv.Itoa(sensorData.Date.Year())
+	_, err := redisCli.Do("ZADD", key, message.Payload())
+	if err != nil {
+		log.Printf("%s", err)
+	}
 }
 
-func onPressReceived(client MQTT.Client, message MQTT.Message) {
-	fmt.Printf("Received pressure value: %s\n", message.Payload())  
-}
-
-func onTempReceived(client MQTT.Client, message MQTT.Message) {
-	fmt.Printf("Received temperature value: %s\n", message.Payload())
-}
 func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -52,9 +56,7 @@ func newRedisClient(addr string, pass string) redis.Conn {
 func newMQQTClient() MQTT.Client {
 	hostname, _ := os.Hostname()
 	server := flag.String("server", "farmer.cloudmqtt.com:15652", "The full url of the MQTT server to connect")
-	topicWind := flag.String("topicWind", "captor/wind", "wind topic")
-	topicPress := flag.String("topicPress", "captor/pressure", "pressure topic")
-	topicTemp := flag.String("topicTemp", "captor/temperature", "temperature topic")
+	captorTopic := flag.String("topicWind", "captor/*", "Topic")
 	qos := flag.Int("qos", 0, "The QoS to subscribe to messages at")
 	clientid := flag.String("clientid", hostname+strconv.Itoa(time.Now().Second()), "A clientid for the connection")
 	username := flag.String("username", "pvpuovcq", "A username to authenticate to the MQTT server")
@@ -72,14 +74,8 @@ func newMQQTClient() MQTT.Client {
 	connOpts.SetTLSConfig(tlsConfig)
 
 	connOpts.OnConnect = func(c MQTT.Client) {
-		if windToken := c.Subscribe(*topicWind, byte(*qos), onWindReceived); windToken.Wait() && windToken.Error() != nil {
+		if windToken := c.Subscribe(*captorTopic, byte(*qos), onValueReceived); windToken.Wait() && windToken.Error() != nil {
 			panic(windToken.Error())
-		}
-		if pressToken := c.Subscribe(*topicPress, byte(*qos), onPressReceived); pressToken.Wait() && pressToken.Error() != nil {
-			panic(pressToken.Error())
-		}
-		if tempToken := c.Subscribe(*topicTemp, byte(*qos), onTempReceived); tempToken.Wait() && tempToken.Error() != nil {
-			panic(tempToken.Error())
 		}
 	}
 

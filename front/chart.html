@@ -87,17 +87,54 @@
 	
 
 	<script>
+		const http = new XMLHttpRequest()
+		const baseUrl = 'localhost:8080/api/v1/'
+
 		function getInformations() {
 			var parameters = location.search.substring(1).split("&")
 			var temp = parameters[0].split("=");
 			temp = parameters[1].split("=");
-			airportId = unescape(temp[1]);
-			airportName = unescape(temp[1]);
+			var airportId = unescape(temp[1]);
+			var airportName = unescape(temp[1]);
 			document.title = airportName + " airport charts"
 			document.getElementById("airport-title").innerHTML = airportName + " airport"
 		}
-		
-		getInformations()
+
+		function getMesures(typ) {
+			var url = baseUrl + "/mesures/" + airportId + "/" + typ
+
+			http.onreadystatechange = function () {
+				if (this.readyState != 4) return;
+
+				if (this.status == 200) {
+					var data = JSON.parse(this.responseText);
+					// we get the returned data
+					console.log(data)
+				}
+				// end of state change: it can be after some time (async)
+			};
+
+			http.open("GET", baseUrl, true)
+			http.send()
+		}
+
+		function getMoyenne(typ) {
+			var url = baseUrl + "/moyennes/" + airportId + "/" + typ
+
+			http.onreadystatechange = function () {
+				if (this.readyState != 4) return;
+
+				if (this.status == 200) {
+					var data = JSON.parse(this.responseText);
+					// we get the returned data
+					console.log(data)
+				}
+				// end of state change: it can be after some time (async)
+			};
+
+			http.open("GET", baseUrl, true)
+			http.send()
+		}
 		
 		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		var tempConfig = {
@@ -258,6 +295,8 @@
 			}
 		};
 		window.onload = function() {
+			getInformations()
+
 			var ctx = document.getElementById('temp-mesures').getContext('2d');
 			var tempChart = new Chart(ctx, tempConfig);
 			var ctx = document.getElementById('pres-mesures').getContext('2d');

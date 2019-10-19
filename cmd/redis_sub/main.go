@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Evrard-Nil/middleware/internal/client"
+
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gomodule/redigo/redis"
@@ -36,7 +38,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	redisCli = newRedisClient("redis-10932.c1.us-west-2-2.ec2.cloud.redislabs.com:10932", "uutPD4Eh1qkYtGWxiuYvfXE7Ri5N7oPQ")
-	mQTTCli = newMQQTClient()
+	mQTTCli = client.Connect()
 	defer redisCli.Close()
 	defer mQTTCli.Disconnect(250)
 	<-c

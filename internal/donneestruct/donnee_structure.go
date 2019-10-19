@@ -16,7 +16,7 @@ type DonneesCapteur struct {
 }
 
 func (d DonneesCapteur) String() string {
-	return fmt.Sprintf("{\"capteur_id\": %d"+"\n\"aeroport_id\": \"%s\""+"\n\"nature\": \"%s\""+"\n\"valeur\": %f"+"\n\"date\": %s\n}\n", d.CapteurID, d.AeroportID, d.Nature, d.Valeur, d.Date)
+	return fmt.Sprintf("{\"capteur_id\": %d"+",\n\"aeroport_id\": \"%s\""+",\n\"nature\": \"%s\""+",\n\"valeur\": %f"+",\n\"date\": %s\n}\n", d.CapteurID, d.AeroportID, d.Nature, d.Valeur, d.Date)
 }
 
 type Mesure struct {

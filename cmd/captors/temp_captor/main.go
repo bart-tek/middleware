@@ -31,7 +31,7 @@ func getDonnees() []byte {
 	generatedData := donneestruct.DonneesCapteur{
 		CapteurID:  generateCapteurID(),
 		AeroportID: generateAeroportID(),
-		Nature:     enumnature.WIND,
+		Nature:     enumnature.TEMP,
 		Valeur:     generateValeur(),
 		Date:       time.Now(),
 	}

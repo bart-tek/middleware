@@ -31,7 +31,7 @@ func getDonnees() []byte {
 	generatedData := donneestruct.DonneesCapteur{
 		CapteurID:  generateCapteurID(),
 		AeroportID: generateAeroportID(),
-		Nature:     enumnature.WIND,
+		Nature:     enumnature.PRES,
 		Valeur:     generateValeur(),
 		Date:       time.Now(),
 	}
@@ -83,7 +83,7 @@ loop:
 		select {
 		default:
 			connection.Publish(*topicPress, byte(*qos), false, getDonnees())
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 5)
 		case <-c:
 			break loop
 		}

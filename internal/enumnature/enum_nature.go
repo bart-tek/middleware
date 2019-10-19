@@ -2,11 +2,11 @@ package enumnature
 
 const (
 	// TEMP Temperature
-	TEMP = "Temperature"
+	TEMP = "temperature"
 
 	// PRES Pression
-	PRES = "Atmospheric pressure"
+	PRES = "atmospheric_pressure"
 
 	// WIND Wind
-	WIND = "Wind speed"
+	WIND = "wind_speed"
 )

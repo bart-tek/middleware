@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -24,16 +26,20 @@ func main() {
 	publish()
 }
 
-func getDonnees() donneestruct.DonneesCapteur {
+func getDonnees() []byte {
 
-	return donneestruct.DonneesCapteur{
+	generatedData := donneestruct.DonneesCapteur{
 		CapteurID:  generateCapteurID(),
 		AeroportID: generateAeroportID(),
-		Nature:     enumnature.PRES,
+		Nature:     enumnature.WIND,
 		Valeur:     generateValeur(),
 		Date:       time.Now(),
 	}
-
+	json, err := json.Marshal(generatedData)
+	if err != nil {
+		log.Fatalf("Can't marshall data: %s", err)
+	}
+	return json
 }
 
 func generateValeur() float32 {
@@ -76,7 +82,7 @@ loop:
 	for {
 		select {
 		default:
-			connection.Publish(*topicPress, byte(*qos), false, getDonnees().String())
+			connection.Publish(*topicPress, byte(*qos), false, getDonnees())
 			time.Sleep(time.Second)
 		case <-c:
 			break loop

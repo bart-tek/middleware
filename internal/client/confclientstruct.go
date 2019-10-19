@@ -31,8 +31,8 @@ type ConfClientStruct struct {
 
 // GetConf Méthode qui lit le fichier de configuration, le parse et peuple la structure avec la configuration récupérée
 func (c *ConfClientStruct) GetConf() *ConfClientStruct {
-
-	yamlFile, err := ioutil.ReadFile("internal/conf/confBroker.yaml")
+	projectPath := os.Getenv("GOPATH") + "/src/github.com/Evrard-Nil/middleware"
+	yamlFile, err := ioutil.ReadFile(projectPath + "/internal/conf/confBroker.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 	}

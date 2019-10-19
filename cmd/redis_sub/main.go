@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -25,9 +24,9 @@ func onValueReceived(client MQTT.Client, message MQTT.Message) {
 	if err := json.Unmarshal(message.Payload(), &sensorData); err != nil {
 		log.Printf("%s", err)
 	}
-	fmt.Printf("Received "+sensorData.Nature+" value: %s\n", message.Payload())
-	key := sensorData.AeroportID + "." + strconv.Itoa(sensorData.Date.Year())
-	_, err := redisCli.Do("ZADD", key, message.Payload())
+	log.Printf("Received %s value: %s\n", sensorData.Nature, message.Payload())
+	key := sensorData.AeroportID + "." + sensorData.Nature + "." + strconv.Itoa(sensorData.Date.Year())
+	_, err := redisCli.Do("ZADD", key, strconv.Itoa(int(sensorData.Date.Unix())), message.Payload())
 	if err != nil {
 		log.Printf("%s", err)
 	}
@@ -56,7 +55,7 @@ func newRedisClient(addr string, pass string) redis.Conn {
 func newMQQTClient() MQTT.Client {
 	hostname, _ := os.Hostname()
 	server := flag.String("server", "farmer.cloudmqtt.com:15652", "The full url of the MQTT server to connect")
-	captorTopic := flag.String("topicWind", "captor/*", "Topic")
+	captorTopic := flag.String("topicWind", "captor/#", "Topic")
 	qos := flag.Int("qos", 0, "The QoS to subscribe to messages at")
 	clientid := flag.String("clientid", hostname+strconv.Itoa(time.Now().Second()), "A clientid for the connection")
 	username := flag.String("username", "pvpuovcq", "A username to authenticate to the MQTT server")

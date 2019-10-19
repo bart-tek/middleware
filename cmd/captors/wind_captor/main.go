@@ -83,8 +83,7 @@ loop:
 		select {
 		default:
 			connection.Publish(*topicWind, byte(*qos), false, getDonnees())
-			log.Printf("Published new value")
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 		case <-c:
 			break loop
 		}

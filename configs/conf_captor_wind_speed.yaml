@@ -1,0 +1,23 @@
+airports:
+  [
+    "ORY",
+    "NCE",
+    "LYS",
+    "TLS",
+    "MRS",
+    "BSL",
+    "BOD",
+    "NTE",
+    "BVA",
+    "RUN",
+    "PTP",
+    "LIL",
+    "FDF",
+    "MPL",
+  ]
+
+topic: captors/wind
+qos: 0
+timeBtwData: 5
+clientID: wind_captor
+nature: wind

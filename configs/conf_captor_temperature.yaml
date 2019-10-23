@@ -1,0 +1,23 @@
+airports:
+  [
+    "ORY",
+    "NCE",
+    "LYS",
+    "TLS",
+    "MRS",
+    "BSL",
+    "BOD",
+    "NTE",
+    "BVA",
+    "RUN",
+    "PTP",
+    "LIL",
+    "FDF",
+    "MPL",
+  ]
+
+topic: captors/temperature
+qos: 0
+timeBtwData: 5
+clientID: temperature_captor
+nature: temperature

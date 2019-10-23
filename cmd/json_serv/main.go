@@ -39,8 +39,7 @@ func mesuresHandler(w http.ResponseWriter, r *http.Request) {
 			endDate := queryValues.Get("endDate")
 			endTime, err2 := time.Parse(layoutHeure, endDate)
 			if err1 == nil && err2 == nil {
-				fmt.Printf("begin : ", beginTime)
-				fmt.Printf("end : ", endTime)
+				getDataBetweenDates(beginTime, endTime)
 				test := donneestruct.MonTest{Nature: nature, Aeroport: aeroport}
 				w.WriteHeader(http.StatusFound)
 				writeJSON(w, test)
@@ -63,7 +62,7 @@ func moyennesHandler(w http.ResponseWriter, r *http.Request) {
 			date := queryValues.Get("date")
 			dateTime, err := time.Parse(layoutDate, date)
 			if err == nil {
-				fmt.Printf("date : ", dateTime)
+				getDataForOneDate(dateTime)
 				test := donneestruct.MonTest{Nature: "null", Aeroport: aeroport}
 				w.WriteHeader(http.StatusFound)
 				writeJSON(w, test)
@@ -73,6 +72,16 @@ func moyennesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
+}
+
+func getDataBetweenDates(beginTime time.Time, endTime time.Time) {
+	fmt.Printf("t1 : ", beginTime.Unix())
+	fmt.Printf("t2 : ", endTime.Unix())
+	// ZRANGEBYSCORE
+}
+
+func getDataForOneDate(dateTime time.Time) {
+	fmt.Printf("t : ", dateTime.Unix())
 }
 
 func writeJSON(w http.ResponseWriter, data interface{}) {

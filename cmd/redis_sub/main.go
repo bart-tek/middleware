@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/Evrard-Nil/middleware/internal/client"
+	"github.com/Evrard-Nil/middleware/internal/mqtt_client"
 
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -25,6 +25,7 @@ func onValueReceived(client MQTT.Client, message MQTT.Message) {
 	}
 	log.Printf("Received %s value: %s\n", sensorData.Nature, message.Payload())
 	key := sensorData.AeroportID + ":" + sensorData.Nature + ":" + strconv.Itoa(sensorData.Date.Year())
+	log.Printf("Inserting in key %s", key)
 	_, err := redisCli.Do("ZADD", key, strconv.Itoa(int(sensorData.Date.Unix())), message.Payload())
 	if err != nil {
 		log.Printf("%s", err)
@@ -35,8 +36,8 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	redisCli = newRedisClient("redis-10932.c1.us-west-2-2.ec2.cloud.redislabs.com:10932", "uutPD4Eh1qkYtGWxiuYvfXE7Ri5N7oPQ")
-	mQTTCli = client.Connect()
-	mQTTCli.Subscribe("captor/#", 0, onValueReceived)
+	mQTTCli = mqtt_client.Connect("redis_sub")
+	mQTTCli.Subscribe("captors/#", 0, onValueReceived)
 	defer redisCli.Close()
 	defer mQTTCli.Disconnect(250)
 	<-c

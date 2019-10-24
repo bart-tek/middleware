@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
+	"github.com/Evrard-Nil/middleware/internal/redis_client"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -19,7 +20,8 @@ var layoutDate = "2006-01-02"
 var redisCli redis.Conn
 
 func main() {
-	redisCli = newRedisClient("redis-10932.c1.us-west-2-2.ec2.cloud.redislabs.com:10932", "uutPD4Eh1qkYtGWxiuYvfXE7Ri5N7oPQ")
+	confRedis := redis_client.GetConf()
+	redisCli = redis_client.ConnectToRedis(confRedis)
 	http.HandleFunc("/api/v1/measures/", measuresHandler)
 	http.HandleFunc("/api/v1/averages/", averagesHandler)
 	defer redisCli.Close()
@@ -34,7 +36,7 @@ func measuresHandler(w http.ResponseWriter, r *http.Request) {
 		urlParts := strings.Split(r.URL.Path, "/")
 		if len(urlParts) == 6 {
 
-			// Get all the informations from the url
+			// Get all the data from the url
 			aeroport := urlParts[4]
 			nature := urlParts[5]
 			queryValues := r.URL.Query()
@@ -80,7 +82,7 @@ func averagesHandler(w http.ResponseWriter, r *http.Request) {
 		urlParts := strings.Split(r.URL.Path, "/")
 		if len(urlParts) == 5 {
 
-			// Get all the informations from the url
+			// Get all the data from the url
 			aeroport := urlParts[4]
 			queryValues := r.URL.Query()
 			date := queryValues.Get("date")
@@ -177,14 +179,4 @@ func writeJSON(w http.ResponseWriter, data interface{}) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
-}
-
-func newRedisClient(addr string, pass string) redis.Conn {
-	client, err := redis.Dial("tcp", addr, redis.DialPassword(pass))
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Printf("Succesfully connected to Redis at %s\n", addr)
-	}
-	return client
 }

@@ -1,6 +1,7 @@
 package redis_client
 
 import (
+	"go/build"
 	"io/ioutil"
 	"log"
 	"os"
@@ -17,7 +18,11 @@ type RedisConf struct {
 
 //GetConf Retrieve conf from configs folder
 func GetConf() RedisConf {
-	projectPath := os.Getenv("GOPATH") + "/src/github.com/Evrard-Nil/middleware"
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	projectPath := gopath + "/src/github.com/Evrard-Nil/middleware"
 	yamlFile, err := ioutil.ReadFile(projectPath + "/configs/conf_redis.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)

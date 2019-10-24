@@ -18,6 +18,7 @@ airports:
 
 topic: captors/temperature
 qos: 0
-timeBtwData: 5
+timeBtwData: 1
 clientID: temperature_captor
+# Has to be from enum in donnestruct
 nature: temperature

@@ -71,15 +71,15 @@
 			<div class="card">
 				<div class="container">
 					<h4><b>Temperature average</b></h4> 
-					<p id="temp-moyenne">12°C</p> 
+					<p id="averageTemp"></p> 
 				</div>
 				<div class="container">
 					<h4><b>Pressure average</b></h4> 
-					<p id="pres-moyenne">12°C</p> 
+					<p id="averagePres"></p> 
 				</div>
 				<div class="container">
 					<h4><b>Wind average</b></h4> 
-					<p id="wind-moyenne">12°C</p> 
+					<p id="averageWind"></p> 
 				</div>
 			</div>
 		</div>
@@ -127,6 +127,9 @@
 					var data = JSON.parse(this.responseText);
 					// we get the returned data
 					console.log(data)
+					document.getElementById("averageTemp").innerHTML = data["averageTemp"]
+					document.getElementById("averagePres").innerHTML = data["averagePres"]
+					document.getElementById("averageWind").innerHTML = data["averageWind"]
 				}
 				// end of state change: it can be after some time (async)
 			};

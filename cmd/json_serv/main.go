@@ -17,14 +17,14 @@ import (
 
 var layoutHeure = "2006-01-02T15:04:05Z"
 var layoutDate = "2006-01-02"
-var redisCli redis.Conn
+var redisPool *redis.Pool
 
 func main() {
 	confRedis := redis_client.GetConf()
-	redisCli = redis_client.ConnectToRedis(confRedis)
+	redisPool = redis_client.InitRedisPool(confRedis)
 	http.HandleFunc("/api/v1/measures/", measuresHandler)
 	http.HandleFunc("/api/v1/averages/", averagesHandler)
-	defer redisCli.Close()
+	defer redisPool.Close()
 	err := http.ListenAndServe(":8082", nil)
 	log.Fatal(err)
 }
@@ -147,6 +147,8 @@ func averagesHandler(w http.ResponseWriter, r *http.Request) {
 // Get data between two dates using a key
 func getDataBetweenDates(key string, beginTime time.Time, endTime time.Time) []donneestruct.DonneesCapteur {
 	// fmt.Println("key : ", key)
+	redisCli := redisPool.Get()
+	defer redisCli.Close()
 	var data []donneestruct.DonneesCapteur
 	res, err := redis.Values(redisCli.Do("ZRANGEBYSCORE", key, beginTime.Unix(), endTime.Unix()))
 	if err != nil {

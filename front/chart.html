@@ -87,7 +87,6 @@
 	
 
 	<script>
-		const http = new XMLHttpRequest()
 		const baseUrl = 'http://localhost:8082/api/v1/'
 		var airportId;
 		var airportName;
@@ -95,47 +94,45 @@
 		function getInformations() {
 			var parameters = location.search.substring(1).split("&")
 			var temp = parameters[0].split("=");
-			temp = parameters[1].split("=");
 			airportId = unescape(temp[1]);
+			temp = parameters[1].split("=");
 			airportName = unescape(temp[1]);
 			document.title = airportName + " airport charts"
 			document.getElementById("airport-title").innerHTML = airportName + " airport"
 		}
 
 		function getMeasures(typ) {
+			let xhttp = new XMLHttpRequest()
 			var url = baseUrl + "measures/" + airportId + "/" + typ + "?beginDate=2010-10-10T12:12:12Z&endDate=2040-10-10T12:12:12Z"
 
-			http.onreadystatechange = function () {
-				if (this.DONE) {
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState === 4) {
 					var data = JSON.parse(this.responseText);
 					// we get the returned data
-					console.log("hello measures")
 					console.log(data)
 				}
 				// end of state change: it can be after some time (async)
 			};
 
-			http.open("GET", url, true)
-			http.send()
+			xhttp.open("GET", url, true)
+			xhttp.send()
 		}
 
 		function getAverages() {
+			let xhttp = new XMLHttpRequest()
 			var url = baseUrl + "averages/" + airportId + "?date=2020-10-10"
 
-			http.onreadystatechange = function () {
-				if (this.readyState != 4) return;
-
-				if (this.status == 200) {
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState === 4) {
 					var data = JSON.parse(this.responseText);
 					// we get the returned data
-					console.log("hello average")
 					console.log(data)
 				}
 				// end of state change: it can be after some time (async)
 			};
 
-			http.open("GET", url, true)
-			http.send()
+			xhttp.open("GET", url, true, )
+			xhttp.send()
 		}
 		
 		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -299,8 +296,8 @@
 		window.onload = function() {
 			getInformations()
 			getMeasures("temperature")
-			getMeasures("pressure")
-			getMeasures("wind")
+			getMeasures("atmospheric_pressure")
+			getMeasures("wind_speed")
 			getAverages()
 
 			var ctx = document.getElementById('temp-mesures').getContext('2d');

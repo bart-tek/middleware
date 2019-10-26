@@ -45,3 +45,21 @@ func ConnectToRedis(conf RedisConf) redis.Conn {
 	}
 	return client
 }
+
+// InitRedisPool returns a pool according to redis conf
+// and allows us to connect with multiple instances to redis server
+func InitRedisPool(conf RedisConf) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:   12,
+		MaxActive: 12000,
+		Dial: func() (redis.Conn, error) {
+			client, err := redis.Dial("tcp", conf.Host, redis.DialPassword(conf.Password))
+			if err != nil {
+				log.Fatal(err)
+				return nil, err
+			}
+			log.Printf("Succesfully connected to Redis at %s\n", conf.Host)
+			return client, err
+		},
+	}
+}

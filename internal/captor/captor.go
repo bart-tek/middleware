@@ -1,6 +1,7 @@
 package captor
 
 import (
+	"go/build"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -36,7 +37,11 @@ func (c *Captor) GenerateAeroportID(min int, max int) string {
 
 //GetConf Retrieve conf from configs folder
 func (c *Captor) GetConf(nat string) {
-	projectPath := os.Getenv("GOPATH") + "/src/github.com/Evrard-Nil/middleware"
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	projectPath := gopath + "/src/github.com/Evrard-Nil/middleware"
 	yamlFile, err := ioutil.ReadFile(projectPath + "/configs/conf_captor_" + nat + ".yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)

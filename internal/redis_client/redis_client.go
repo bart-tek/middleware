@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gomodule/redigo/redis"
 	"gopkg.in/yaml.v2"
@@ -44,4 +45,26 @@ func ConnectToRedis(conf RedisConf) redis.Conn {
 		log.Printf("Succesfully connected to Redis at %s\n", conf.Host)
 	}
 	return client
+}
+
+// InitRedisPool returns a pool according to redis conf
+// and allows us to connect with multiple instances to redis server
+func InitRedisPool(conf RedisConf) *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     5,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			client, err := redis.Dial("tcp", conf.Host, redis.DialPassword(conf.Password))
+			if err != nil {
+				return nil, err
+			}
+			return client, err
+		},
+		TestOnBorrow: func(c redis.Conn, t time.Time) error {
+			_, err := c.Do("PING")
+			log.Printf("%s", err)
+			log.Printf("Succesfully connected to Redis at %s\n", conf.Host)
+			return err
+		},
+	}
 }

@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
@@ -17,16 +20,24 @@ import (
 
 var layoutHeure = "2006-01-02T15:04:05Z"
 var layoutDate = "2006-01-02"
+var redisPool *redis.Pool
 var redisCli redis.Conn
 
 func main() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
 	confRedis := redis_client.GetConf()
-	redisCli = redis_client.ConnectToRedis(confRedis)
+	redisPool = redis_client.InitRedisPool(confRedis)
+	redisCli = redisPool.Get()
 	http.HandleFunc("/api/v1/measures/", measuresHandler)
 	http.HandleFunc("/api/v1/averages/", averagesHandler)
 	defer redisCli.Close()
+	defer redisPool.Close()
 	err := http.ListenAndServe(":8082", nil)
 	log.Fatal(err)
+
+	<-c
 }
 
 // Get measures for an airport between two dates

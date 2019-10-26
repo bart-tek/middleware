@@ -110,6 +110,66 @@
 					var data = JSON.parse(this.responseText);
 					// we get the returned data
 					console.log(data)
+
+
+					// TEMPERATURE CONFIGURATION
+					let tempData;
+					let date;
+					let temperatureDatas = [];
+					console.log(Object.keys("measures").length)
+					for(let i = 0; i < Object.keys("measures").length; i++) {
+						date = new Date(data["measures"][i].date)
+						tempData = {
+							x: date.getMonth().toString() + "-" + date.getFullYear().toString(),
+							y: data["measures"][i].value
+						}
+						temperatureDatas.push(tempData)
+					}
+					console.log(temperatureDatas)
+					/* tempConfig = {
+						type: 'line',
+						data: {
+							datasets: [{
+								label: 'Temperature data',
+								backgroundColor: window.chartColors.red,
+								borderColor: window.chartColors.red,
+								data: [
+									[10, 20, 30, 10, 50, 65]
+								],
+								fill: false,
+							}]
+						},
+						options: {
+							responsive: true,
+							title: {
+								display: true,
+								text: 'Temperature Chart'
+							},
+							tooltips: {
+								mode: 'index',
+								intersect: false,
+							},
+							hover: {
+								mode: 'nearest',
+								intersect: true
+							},
+							scales: {
+								xAxes: [{
+									type: 'time',
+									time: {
+										unit: 'month'
+									}
+								}],
+								yAxes: [{
+									display: true,
+									scaleLabel: {
+										display: true,
+										labelString: 'Temperature (°C)'
+									}
+								}]
+							}
+						}
+					}; */
 				}
 				// end of state change: it can be after some time (async)
 			};
@@ -138,7 +198,6 @@
 			xhttp.send()
 		}
 		
-		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 		var tempConfig = {
 			type: 'line',
 			data: {
@@ -190,7 +249,7 @@
 					}]
 				}
 			}
-		};
+		}
 		var presConfig = {
 			type: 'line',
 			data: {
@@ -200,13 +259,7 @@
 					backgroundColor: window.chartColors.blue,
 					borderColor: window.chartColors.blue,
 					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
+						[10, 20, 30, 10, 50, 65]
 					],
 					fill: false,
 				}]
@@ -253,13 +306,7 @@
 					backgroundColor: window.chartColors.green,
 					borderColor: window.chartColors.green,
 					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
+						[10, 20, 30, 10, 50, 65]
 					],
 					fill: false,
 				}]

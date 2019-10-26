@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
@@ -21,23 +18,15 @@ import (
 var layoutHeure = "2006-01-02T15:04:05Z"
 var layoutDate = "2006-01-02"
 var redisPool *redis.Pool
-var redisCli redis.Conn
 
 func main() {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
 	confRedis := redis_client.GetConf()
 	redisPool = redis_client.InitRedisPool(confRedis)
-	redisCli = redisPool.Get()
 	http.HandleFunc("/api/v1/measures/", measuresHandler)
 	http.HandleFunc("/api/v1/averages/", averagesHandler)
-	defer redisCli.Close()
 	defer redisPool.Close()
 	err := http.ListenAndServe(":8082", nil)
 	log.Fatal(err)
-
-	<-c
 }
 
 // Get measures for an airport between two dates
@@ -158,6 +147,8 @@ func averagesHandler(w http.ResponseWriter, r *http.Request) {
 // Get data between two dates using a key
 func getDataBetweenDates(key string, beginTime time.Time, endTime time.Time) []donneestruct.DonneesCapteur {
 	// fmt.Println("key : ", key)
+	redisCli := redisPool.Get()
+	defer redisCli.Close()
 	var data []donneestruct.DonneesCapteur
 	res, err := redis.Values(redisCli.Do("ZRANGEBYSCORE", key, beginTime.Unix(), endTime.Unix()))
 	if err != nil {

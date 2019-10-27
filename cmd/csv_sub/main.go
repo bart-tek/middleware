@@ -8,15 +8,16 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
-	"time"
-
-	"github.com/Evrard-Nil/middleware/internal/client"
 
 	"github.com/Evrard-Nil/middleware/internal/donneestruct"
-	"github.com/Evrard-Nil/middleware/internal/enumnature"
-
+	"github.com/Evrard-Nil/middleware/internal/mqtt_client"
+	"github.com/Evrard-Nil/middleware/internal/redis_client"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gomodule/redigo/redis"
 )
+
+var redisCli redis.Conn
+var mQTTCli MQTT.Client
 
 // onWinReceived is the function called when we get a MQTT message on the "captor/wind" channel
 //
@@ -72,26 +73,15 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	client := client.Connect()
+	confRedis := redis_client.GetConf()
+	redisCli = redis_client.ConnectToRedis(confRedis)
+	defer redisCli.Close()
 
-	// Test du publish
-	captorStruct := donneestruct.DonneesCapteur{
-		CapteurID:  0,
-		AeroportID: "NTE",
-		Nature:     enumnature.PRES,
-		Valeur:     4,
-		Date:       time.Now(),
-	}
-
-	for i := 0; i < 20; i++ {
-		captorStruct.Valeur = captorStruct.Valeur + (float32(i) * 0.3)
-		captorStruct.Date = captorStruct.Date.Add(20 * time.Second)
-		captorString, err := json.Marshal(captorStruct)
-		if err != nil {
-			log.Printf("%s", err)
-		}
-		client.Publish("captor/wind", 0, false, captorString)
-	}
+	mQTTCli = mqtt_client.Connect("redis_sub")
+	mQTTCli.Subscribe("captors/temperature", 0, onTempReceived)
+	mQTTCli.Subscribe("captors/pressure", 0, onPressReceived)
+	mQTTCli.Subscribe("captors/wind", 0, onWindReceived)
+	defer mQTTCli.Disconnect(250)
 
 	<-c
 }

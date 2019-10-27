@@ -73,6 +73,8 @@
 		</div>
 		<div class="column" style="width: 20%; float: right;">
 			<div class="card">
+				<br>
+				<center><h4>Today's date : 2039-09-12</h4></center>
 				<div class="container">
 					<h4><b>Temperature average</b></h4> 
 					<p id="averageTemp"></p> 
@@ -109,7 +111,7 @@
 		// Get the average measures for an airport
 		function getAverages() {
 			let xhttp = new XMLHttpRequest()
-			var url = baseUrl + "averages/" + airportId + "?date=2020-10-10"
+			var url = baseUrl + "averages/" + airportId + "?date=2039-09-12"
 
 			xhttp.onreadystatechange = function () {
 				if (xhttp.readyState === 4) {

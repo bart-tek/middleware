@@ -207,6 +207,7 @@
 		// Creates the REST request depending on which browser is used
 		function createCORSRequest(method, url) {
 			var xhr = new XMLHttpRequest()
+			xhr.withCredentials = true;
 			if ("withCredentials" in xhr) {
 				xhr.open(method, url, true)
 				xhr.send()

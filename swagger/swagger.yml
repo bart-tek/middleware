@@ -1,0 +1,104 @@
+swagger: "2.0"
+info:
+  description: "Test middleware server"
+  version: "1.0.0"
+  title: "Swagger Middleware"
+host: "localhost:8082"
+basePath: "/api/v1"
+schemes:
+  - http
+paths:
+  /averages/{airport}:
+    get:
+      summary: "Find averages for an airport"
+      description: "Returns the averages for a given day and airport"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "airport"
+        in: "path"
+        description: "ID of the airport"
+        required: true
+        type: "string"
+      - name: "date"
+        in: "query"
+        description: "Choosen day"
+        required: true
+        type: "string"
+        format: "date-time"
+      responses:
+        302:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Average"
+        400:
+          description: "bad request"
+  /measures/{airport}/{type}:
+    get:
+      summary: "Find measures for an airport and a data type"
+      description: "Returns the measures between the given dates for a type and an airport"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "airport"
+        in: "path"
+        description: "ID of the airport"
+        required: true
+        type: "string"
+      - name: "type"
+        in: "path"
+        description: "ID of data"
+        required: true
+        type: "string"
+      - name: "beginDate"
+        in: "query"
+        description: "Begin date"
+        required: true
+        type: "string"
+        format: "date-time"
+      - name: "endDate"
+        in: "query"
+        description: "End date"
+        required: true
+        type: "string"
+        format: "date-time"
+      responses:
+        302:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Measures"
+        400:
+          description: "bad request"
+          
+definitions:
+  Average:
+    type: "object"
+    properties:
+      averageTemp:
+        type: "number"
+        format: "float32"
+      averagePres:
+        type: "number"
+        format: "float32"
+      averageWind:
+        type: "number"
+        format: "float32"
+  Measures:
+    type: "object"
+    properties:
+      measures:
+        type: "array"
+        items:
+          $ref: "#/definitions/Measure"
+  Measure:
+    type: "object"
+    properties:
+      captor_id:
+        type: "integer"
+        format: "int64"
+      value: 
+        type: "number"
+        format: "float32"
+      date:
+        type: "string"
+        format: "date-time"

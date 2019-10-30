@@ -110,8 +110,8 @@
 
 		// Get the average measures for an airport
 		function getAverages() {
-			let xhttp = new XMLHttpRequest()
 			var url = baseUrl + "averages/" + airportId + "?date=2039-09-12"
+			let xhttp = createCORSRequest("GET", url)
 
 			xhttp.onreadystatechange = function () {
 				if (xhttp.readyState === 4) {
@@ -123,35 +123,24 @@
 				}
 				// end of state change: it can be after some time (async)
 			};
-
-			xhttp.open("GET", url, true, )
-			xhttp.send()
 		}
 
 		// Get the measures for a type of graphic 
 		function getMeasures(id, typ) {
-			let xhttp = new XMLHttpRequest()
 			var url = baseUrl + "measures/" + airportId + "/" + typ + "?beginDate=2010-10-10T12:12:12Z&endDate=2040-10-10T12:12:12Z"
+			let xhttp = createCORSRequest("GET", url)
 
 			xhttp.onreadystatechange = function () {
 				if (xhttp.readyState === 4) {
 					var data = JSON.parse(this.responseText)
-					console.log("xhttp")
-					console.log(data)
 					
 					createChartData(id, typ, data)
 				}
 			};
-
-			xhttp.open("GET", url, true)
-			xhttp.send()
 		}
 
 		// Creates the temperature chart
 		function createChartData(id, typ, data) {
-			console.log("create")
-			console.log(data)
-
 			let chartData
 			let date
 			let chartDatas = [];
@@ -170,8 +159,6 @@
 
 		// Function that creates a chart
 		function renderChart(id, typ, data, labels) {
-			console.log("render")
-			console.log(labels)
 			var ctx = document.getElementById(id).getContext('2d');
 			var myChart = new Chart(ctx, {
 				type: 'line',
@@ -215,6 +202,22 @@
 					}
 				}
 			});
+		}
+
+		// Creates the REST request depending on which browser is used
+		function createCORSRequest(method, url) {
+			var xhr = new XMLHttpRequest()
+			if ("withCredentials" in xhr) {
+				xhr.open(method, url, true)
+				xhr.send()
+			} else if (typeof XDomainRequest != "undefined") {
+				xhr = new XDomainRequest()
+				xhr.open(method, url)
+				xhr.send()
+			} else {
+				xhr = null
+			}
+			return xhr
 		}
 
 		window.onload = function() {

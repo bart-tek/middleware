@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"go/build"
 	"log"
 	"os"
 	"path/filepath"
@@ -16,6 +17,11 @@ import (
 // @return void
 //
 func WriteCsv(date string, aeroportID string, capteurID string, nature string, valeur string) {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	projectPath := gopath + "/src/github.com/Evrard-Nil/middleware"
 
 	layout := "2006-01-02 15:04:05 -0700 MST"
 	timestamp, err := time.Parse(layout, date)
@@ -27,7 +33,7 @@ func WriteCsv(date string, aeroportID string, capteurID string, nature string, v
 		[]string{hour, valeur},
 	}
 
-	filePath, err := filepath.Abs("../../data/" + aeroportID + "-" + day + "-" + nature + ".csv")
+	filePath, err := filepath.Abs(projectPath + "/data/" + aeroportID + "-" + day + "-" + nature + ".csv")
 	checkError("Error in the path", err)
 
 	// Reads the csv file if it exists

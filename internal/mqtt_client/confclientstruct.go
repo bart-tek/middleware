@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"go/build"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,7 +34,11 @@ type ConfClientStruct struct {
 
 // GetConf Méthode qui lit le fichier de configuration, le parse et peuple la structure avec la configuration récupérée
 func (c *ConfClientStruct) GetConf() *ConfClientStruct {
-	projectPath := os.Getenv("GOPATH") + "/src/github.com/Evrard-Nil/middleware"
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		gopath = build.Default.GOPATH
+	}
+	projectPath := gopath + "/src/github.com/Evrard-Nil/middleware"
 	yamlFile, err := ioutil.ReadFile(projectPath + "/configs/confBroker.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)

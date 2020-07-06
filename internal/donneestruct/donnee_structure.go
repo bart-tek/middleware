@@ -14,22 +14,22 @@ type DonneesCapteur struct {
 }
 
 //Mesure represents a measure made by a captor
-type Mesure struct {
-	CapteurID int       `json:"capteur_id"`
-	Valeur    float32   `json:"valeur"`
-	Date      time.Time `json:"date"`
+type Measure struct {
+	CaptorID int       `json:"captor_id"`
+	Value    float32   `json:"value"`
+	Date     time.Time `json:"date"`
+}
+
+// Measures contains a list of measures to be converted in json
+type Measures struct {
+	Measures []Measure `json:"measures"`
 }
 
 //Moyenne represents the average of a ind of measure
-type Moyenne struct {
-	Nature string  `json:"nature"`
-	Valeur float32 `json:"valeur"`
-}
-
-//MonTest oisdsdqsd
-type MonTest struct {
-	Nature   string `json:"nature"`
-	Aeroport string `json:"aeroport"`
+type Average struct {
+	AverageTemp float32 `json:"averageTemp"`
+	AveragePres float32 `json:"averagePres"`
+	AverageWind float32 `json:"averageWind"`
 }
 
 // Enum for nature of captor

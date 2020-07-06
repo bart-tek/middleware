@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/Evrard-Nil/middleware/internal/captor"
@@ -29,7 +30,7 @@ func getDonnees() []byte {
 		AeroportID: c.GenerateAeroportID(0, 14),
 		Nature:     c.Nature,
 		Valeur:     c.GenerateValeur(0, 140),
-		Date:       time.Now(),
+		Date:       time.Now().AddDate(rand.Intn(20), rand.Intn(11), rand.Intn(31)),
 	}
 	json, err := json.Marshal(generatedData)
 	if err != nil {

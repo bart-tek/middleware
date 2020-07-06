@@ -64,22 +64,28 @@
 	<div class="row">
 		<div class="column" style="width: 75%; float: left;">
 			<canvas id="temp-mesures"></canvas>
+			<br>
+			<br>
 			<canvas id="pres-mesures"></canvas>
+			<br>
+			<br>
 			<canvas id="wind-mesures"></canvas>
 		</div>
 		<div class="column" style="width: 20%; float: right;">
 			<div class="card">
+				<br>
+				<center><h4>Today's date : 2039-09-12</h4></center>
 				<div class="container">
 					<h4><b>Temperature average</b></h4> 
-					<p id="temp-moyenne">12°C</p> 
+					<p id="averageTemp"></p> 
 				</div>
 				<div class="container">
 					<h4><b>Pressure average</b></h4> 
-					<p id="pres-moyenne">12°C</p> 
+					<p id="averagePres"></p> 
 				</div>
 				<div class="container">
 					<h4><b>Wind average</b></h4> 
-					<p id="wind-moyenne">12°C</p> 
+					<p id="averageWind"></p> 
 				</div>
 			</div>
 		</div>
@@ -87,222 +93,140 @@
 	
 
 	<script>
-		const http = new XMLHttpRequest()
-		const baseUrl = 'localhost:8080/api/v1/'
-
+		const baseUrl = 'http://localhost:8082/api/v1/'
+		var airportId;
+		var airportName;
+		
+		// Get the page informations like the airport ID and name
 		function getInformations() {
 			var parameters = location.search.substring(1).split("&")
-			var temp = parameters[0].split("=");
-			temp = parameters[1].split("=");
-			var airportId = unescape(temp[1]);
-			var airportName = unescape(temp[1]);
+			var temp = parameters[0].split("=")
+			airportId = unescape(temp[1])
+			temp = parameters[1].split("=")
+			airportName = unescape(temp[1])
 			document.title = airportName + " airport charts"
 			document.getElementById("airport-title").innerHTML = airportName + " airport"
 		}
 
-		function getMesures(typ) {
-			var url = baseUrl + "/mesures/" + airportId + "/" + typ
+		// Get the average measures for an airport
+		function getAverages() {
+			var url = baseUrl + "averages/" + airportId + "?date=2039-09-12"
+			let xhttp = createCORSRequest("GET", url)
 
-			http.onreadystatechange = function () {
-				if (this.readyState != 4) return;
-
-				if (this.status == 200) {
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState === 4) {
 					var data = JSON.parse(this.responseText);
 					// we get the returned data
-					console.log(data)
+					document.getElementById("averageTemp").innerHTML = data["averageTemp"]
+					document.getElementById("averagePres").innerHTML = data["averagePres"]
+					document.getElementById("averageWind").innerHTML = data["averageWind"]
 				}
 				// end of state change: it can be after some time (async)
 			};
-
-			http.open("GET", baseUrl, true)
-			http.send()
 		}
 
-		function getMoyenne(typ) {
-			var url = baseUrl + "/moyennes/" + airportId + "/" + typ
+		// Get the measures for a type of graphic 
+		function getMeasures(id, typ) {
+			var url = baseUrl + "measures/" + airportId + "/" + typ + "?beginDate=2010-10-10T12:12:12Z&endDate=2040-10-10T12:12:12Z"
+			let xhttp = createCORSRequest("GET", url)
 
-			http.onreadystatechange = function () {
-				if (this.readyState != 4) return;
-
-				if (this.status == 200) {
-					var data = JSON.parse(this.responseText);
-					// we get the returned data
-					console.log(data)
+			xhttp.onreadystatechange = function () {
+				if (xhttp.readyState === 4) {
+					var data = JSON.parse(this.responseText)
+					
+					createChartData(id, typ, data)
 				}
-				// end of state change: it can be after some time (async)
 			};
-
-			http.open("GET", baseUrl, true)
-			http.send()
 		}
-		
-		var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-		var tempConfig = {
-			type: 'line',
-			data: {
-				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-				datasets: [{
-					label: 'Temperature data',
-					backgroundColor: window.chartColors.red,
-					borderColor: window.chartColors.red,
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					],
-					fill: false,
-				}]
-			},
-			options: {
-				responsive: true,
-				title: {
-					display: true,
-					text: 'Temperature Chart'
-				},
-				tooltips: {
-					mode: 'index',
-					intersect: false,
-				},
-				hover: {
-					mode: 'nearest',
-					intersect: true
-				},
-				scales: {
-					xAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Month'
-						}
-					}],
-					yAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Temperature (°C)'
-						}
-					}]
-				}
-			}
-		};
-		var presConfig = {
-			type: 'line',
-			data: {
-				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-				datasets: [{
-					label: 'Pressure data',
-					backgroundColor: window.chartColors.blue,
-					borderColor: window.chartColors.blue,
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					],
-					fill: false,
-				}]
-			},
-			options: {
-				responsive: true,
-				title: {
-					display: true,
-					text: 'Pressure Chart'
-				},
-				tooltips: {
-					mode: 'index',
-					intersect: false,
-				},
-				hover: {
-					mode: 'nearest',
-					intersect: true
-				},
-				scales: {
-					xAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Month'
-						}
-					}],
-					yAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Pressure (Pa)'
-						}
-					}]
-				}
-			}
-		};
 
-		var windConfig = {
-			type: 'line',
-			data: {
-				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-				datasets: [{
-					label: 'Wind data',
-					backgroundColor: window.chartColors.green,
-					borderColor: window.chartColors.green,
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					],
-					fill: false,
-				}]
-			},
-			options: {
-				responsive: true,
-				title: {
-					display: true,
-					text: 'Wind Chart'
-				},
-				tooltips: {
-					mode: 'index',
-					intersect: false,
-				},
-				hover: {
-					mode: 'nearest',
-					intersect: true
-				},
-				scales: {
-					xAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Month'
-						}
-					}],
-					yAxes: [{
-						display: true,
-						scaleLabel: {
-							display: true,
-							labelString: 'Wind (°C)'
-						}
-					}]
+		// Creates the temperature chart
+		function createChartData(id, typ, data) {
+			let chartData
+			let date
+			let chartDatas = [];
+			let chartLabels = [];
+			for(let i = 0; i < Object.keys(data["measures"]).length; i++) {
+				date = new Date(data["measures"][i].date)
+				chartData = {
+					t: date,
+					y: data["measures"][i].value
 				}
+				chartLabels.push(date.getDay().toString() + "-" + date.getMonth().toString() + "-" + date.getFullYear().toString())
+				chartDatas.push(chartData)
 			}
-		};
+			renderChart(id, typ, chartDatas, chartLabels)
+		}
+
+		// Function that creates a chart
+		function renderChart(id, typ, data, labels) {
+			var ctx = document.getElementById(id).getContext('2d');
+			var myChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+					label: typ.toString(),
+					data: data,
+					backgroundColor: [
+						'rgba(255, 99, 132, 0.2)',
+						'rgba(54, 162, 235, 0.2)',
+						'rgba(255, 206, 86, 0.2)',
+						'rgba(75, 192, 192, 0.2)',
+						'rgba(153, 102, 255, 0.2)',
+						'rgba(255, 159, 64, 0.2)'
+					],
+					borderColor: [
+						'rgba(255,99,132,1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(255, 206, 86, 1)',
+						'rgba(75, 192, 192, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(255, 159, 64, 1)'
+					],
+					borderWidth: 1
+					}]
+				},
+				options: {
+					title: {
+						display: true,
+						text: typ.toString() + ' chart'
+					},
+					scales: {
+						xAxes: [{
+							ticks: {
+								min: 0,
+								max: data.length,
+								stepSize: 0.5
+							}
+						}]
+					}
+				}
+			});
+		}
+
+		// Creates the REST request depending on which browser is used
+		function createCORSRequest(method, url) {
+			var xhr = new XMLHttpRequest()
+			xhr.withCredentials = true;
+			if ("withCredentials" in xhr) {
+				xhr.open(method, url, true)
+				xhr.send()
+			} else if (typeof XDomainRequest != "undefined") {
+				xhr = new XDomainRequest()
+				xhr.open(method, url)
+				xhr.send()
+			} else {
+				xhr = null
+			}
+			return xhr
+		}
+
 		window.onload = function() {
 			getInformations()
-
-			var ctx = document.getElementById('temp-mesures').getContext('2d');
-			var tempChart = new Chart(ctx, tempConfig);
-			var ctx = document.getElementById('pres-mesures').getContext('2d');
-			var presChart = new Chart(ctx, presConfig);
-			var ctx = document.getElementById('wind-mesures').getContext('2d');
-			var windChart = new Chart(ctx, windConfig);
+			getAverages()
+			getMeasures('temp-mesures', 'temperature')
+			getMeasures('pres-mesures', 'atmospheric_pressure')
+			getMeasures('wind-mesures', 'wind_speed')
 		};
 		var colorNames = Object.keys(window.chartColors);
 	</script>

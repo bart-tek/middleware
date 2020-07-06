@@ -18,6 +18,7 @@ airports:
 
 topic: captors/pressure
 qos: 0
-timeBtwData: 5
+timeBtwData: 1
 clientID: pressure_captor
-nature: pressure
+# Has to be from enum in donnestruct
+nature: atmospheric_pressure
